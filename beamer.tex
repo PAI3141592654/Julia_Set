@@ -1,0 +1,192 @@
+\documentclass[serif]{beamer}
+\usepackage{xeCJK}
+\usepackage{amsfonts} 
+\usepackage{amssymb}
+\newcommand\hmmax{0} 
+% \newcommand\bmmax{0} 
+\usepackage{bm}
+\usepackage{amsthm,amsmath,amssymb}
+\usepackage{mathrsfs}
+\usepackage{latexsym}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{palatino}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{listings}
+\usetikzlibrary{arrows.meta,snakes,backgrounds,shapes.geometric}
+\usefonttheme{professionalfonts}%
+\usetheme{Berlin}
+\usecolortheme{whale}
+\useinnertheme[shadow=true]{rounded}
+\usefonttheme[onlymath]{serif}
+\setbeamercovered{transparent}
+\setbeamertemplate{navigation symbols}{} % 
+\setbeamertemplate{footline}{%
+\leavevmode%
+\hbox{%
+
+\begin{beamercolorbox}[wd=.233333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+\usebeamerfont{author in head/foot}\insertshortauthor
+\end{beamercolorbox}%
+
+\begin{beamercolorbox}[wd=.533333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+\usebeamerfont{title in head/foot}\insertshorttitle
+\end{beamercolorbox}%
+
+\begin{beamercolorbox}[wd=.233333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+\usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
+\insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+\end{beamercolorbox}}%
+
+\vskip0pt%
+}% 
+
+\newcommand{\song}{\CJKfamily{song}} 
+\newcommand{\fs}{\CJKfamily{fs}} 
+\newcommand{\kai}{\CJKfamily{kai}} 
+\newcommand{\hei}{\CJKfamily{hei}} 
+\newcommand{\li}{\CJKfamily{li}} 
+\newcommand{\you}{\CJKfamily{you}} 
+\newcommand{\chuhao}{\fontsize{42pt}{\baselineskip}\selectfont} 
+\newcommand{\xiaochuhao}{\fontsize{36pt}{\baselineskip}\selectfont} 
+\newcommand{\yichu}{\fontsize{32pt}{\baselineskip}\selectfont} 
+\newcommand{\yihao}{\fontsize{28pt}{\baselineskip}\selectfont} 
+\newcommand{\erhao}{\fontsize{21pt}{\baselineskip}\selectfont} 
+\newcommand{\xiaoerhao}{\fontsize{18pt}{\baselineskip}\selectfont} 
+\newcommand{\sanhao}{\fontsize{15.75pt}{\baselineskip}\selectfont} 
+\newcommand{\sihao}{\fontsize{14pt}{\baselineskip}\selectfont} 
+\newcommand{\xiaosihao}{\fontsize{12pt}{\baselineskip}\selectfont} 
+\newcommand{\wuhao}{\fontsize{10.5pt}{\baselineskip}\selectfont} 
+\newcommand{\xiaowuhao}{\fontsize{9pt}{\baselineskip}\selectfont} 
+\newcommand{\liuhao}{\fontsize{7.875pt}{\baselineskip}\selectfont} 
+\newcommand{\qihao}{\fontsize{5.25pt}{\baselineskip}\selectfont} 
+
+
+
+\begin{document}
+
+\title[title]{Julia Set的介绍及计算机绘图}
+
+\author[]{彭湃} 
+
+\institute[Sch]{
+
+Hangzhou, China \\
+
+Zhejiang University }
+
+\date[Date below]{\today} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+
+\thispagestyle{empty}
+
+\titlepage
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{目录}
+
+\tableofcontents 
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{数学理论}
+
+\begin{frame}{朱利亚集合的定义}
+
+\begin{itemize}
+\item 朱利亚集合有多种定义方式，为方便作图，这里采用复二项式迭代的定义
+
+\item 朱利亚集合$Z_{c,n}$可定义为使得序列$(z, f_{c,n}(z),f_{c,n}(f_{c,n}(z)),f_{c,n}(f_{c,n}(f_{c,n}(z))), ...)$收敛的复数z的集合，其中$f_{c,n}(z)=z^n+c$，c是一个复数，n是一个正整数，不加说明时默认n=2(Normal Julia Set).
+
+\item 下文还会考虑n>2(multi-Julia Set)的情形\cite{JuliaSet}
+
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{朱利亚集合与曼德博集合的关系}
+
+\begin{block}{$Z_{c,2}$的连通性取决于c与曼德博集合的关系}
+设曼德博集合为M，根据曼德博集合和朱利亚集合的定义，对于复平面内一点c，若$c\in M$，则对应的朱利亚集合$Z_{c,2}$在通常意义下连通；若$c\notin M$，则对应的朱利亚集合$Z_{c,2}$在通常意义下不连通。\cite{TheJuliaSet}
+
+\begin{figure}
+\includegraphics[width=4.8cm,height=2cm]{7}
+\includegraphics[width=4.8cm,height=2cm]{8}
+\caption{连通（左2黑色部分）和不连通（右1黑色部分）朱利亚集合及对应c（左1、右2蓝点）与曼德博集合的关系}
+\end{figure}
+
+\end{block}
+
+
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{算法设计及算例}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{算法设计}
+
+\begin{figure}
+\includegraphics[width=6cm,height=6cm]{9}
+
+\caption{在屏幕上建立坐标系，获取每一个像素点的坐标，设计算法判断它迭代后是否收敛。并根据迭代次数赋予像素点颜色。流程如上：}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{算例及分析}
+
+给定\{n,x,y\}，其中$c=x+iy$，程序将逐一对每个像素点进行上述操作，得到图像。下一页展示的六个例子分别取\{2,0.1,0.62\},\{3,0.5,0.6\},\{4,0.5,0.61\},\{5,0.2,0.695\},\{6,0.51,0.61\},\\\{12,0.61245,0.61245\}，其中第一张是通常意义下的朱利亚集合，而其他五张图则是n>2的情况。由图可知，将图形旋转$\frac{2\pi}{n}$后得到的图形与原图重合。在实践过程中，我们可以发现在曼德博集合的边界附近选择c的值，得到的图形细节最多（如下一页的图片）。
+
+\end{frame}
+
+\begin{frame}{算例及分析}
+\begin{figure}
+\includegraphics[width=3.6cm,height=2.4cm]{2}
+\includegraphics[width=3.6cm,height=2.4cm]{3}
+\includegraphics[width=3.6cm,height=2.4cm]{4}
+\includegraphics[width=3.6cm,height=2.4cm]{5}
+\includegraphics[width=3.6cm,height=2.4cm]{6}
+\includegraphics[width=3.6cm,height=2.4cm]{12}
+\end{figure}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{总结}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{总结及参考文献}
+
+朱利亚集合是一种复杂分形，可以通过复二项式迭代来定义。根据这种定义，我们能用计算机作出其图形。定义式中的c与曼德博集合的关系决定了朱利亚集合的连通性。
+
+\begin{center}
+
+\textcolor{blue}{\Huge{THANK YOU！}}
+
+\end{center}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{plain}
+\bibliography{ref}
+\end{document}

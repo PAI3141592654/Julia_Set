@@ -1,0 +1,107 @@
+\documentclass{ctexart}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{tikz}
+\usepackage{amsthm}
+\usepackage{palatino}
+
+\usetikzlibrary{arrows.meta,snakes,backgrounds,shapes.geometric}
+
+\title{Julia Set的介绍及计算机绘图}
+
+
+\author{彭湃3210100061 \\ 数学与应用数学（强基计划）}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+朱利亚集合是经典的分形之一，利用计算机可作出其近似图形。本文简单描述了朱利亚集合，说明了其与曼德博集合的关系，提供了用计算机作出其近似图形的一种方法（包括n>2的情形），并且提供了示例。
+
+\end{abstract}
+
+\section{引言}
+
+\textbf{朱利亚集合}(Julia set)是一种在复平面上组成分形的点的集合，以数学家加斯顿·朱利亚（Gaston Julia）的名字命名。其通过复二项式迭代生成复杂的图案。运用多种编程语言，我们可以在计算机上作出朱利亚集合的近似图。\cite{JuliaSet}
+
+\section{数学理论}
+
+\subsection{定义}
+朱利亚集合$Z_{c,n}$可定义为使得序列$(z, f_{c,n}(z),f_{c,n}(f_{c,n}(z)),f_{c,n}(f_{c,n}(f_{c,n}(z))), ...)$收敛的复数z的集合，其中$f_{c,n}(z)=z^n+c$，c是一个复数，n是一个正整数，不加说明时默认n=2(Normal Julia Set).\textbf{（本文还会考虑n>2(multi-Julia Set)的情形）}\cite{JuliaSet}
+
+\subsection{与曼德博集合的关系}
+设曼德博集合为M，根据曼德博集合和朱利亚集合的定义，对于复平面内一点c，若$c\in M$，则对应的朱利亚集合$Z_{c,2}$在通常意义下连通；若$c\notin M$，则对应的朱利亚集合$Z_{c,2}$在通常意义下不连通。\cite{TheJuliaSet}
+
+\begin{figure}
+\includegraphics[width=12cm,height=5cm]{7}
+\includegraphics[width=12cm,height=5cm]{8}
+\caption{连通（右上黑色部分）和不连通（右下黑色部分）朱利亚集合及对应c（左上、左下蓝点）与曼德博集合的关系\cite{TheJuliaSet}}
+\end{figure}
+
+\section{算法设计与算例}
+
+\subsection{算法设计}
+
+根据朱利亚集合的定义，我们可以在屏幕上建立坐标系，对于图片文件的每一个像素点，我们获取它的坐标，设计算法判断它是否收敛。算法的基本思路是不断迭代，每次迭代进行判断，直至中途退出$(z\notin M)$或迭代次数达到上限$(z\in M)$，根据迭代次数赋予像素点颜色。算法流程如下：
+
+
+\thispagestyle{empty}
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width = 2cm, minimum height=1cm,text centered, draw = black]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=2cm, minimum height=1cm, text centered, draw=black]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+\tikzstyle{decision} = [diamond, aspect = 3, text centered, draw=black]
+\tikzstyle{arrow} = [->,>=stealth]
+\begin{tikzpicture}[node distance=1cm]
+\node[startstop](start){Start};
+\coordinate (point1) at (-5.2cm, -6cm);
+\coordinate (point2) at (4.2cm, -6cm);
+\coordinate (point3) at (4.2cm, -4cm);
+\node[io, below of = start, yshift = -1cm](in){get coordinate $z=x+iy$};
+\node[process, below of = in, yshift = -1cm](pro0){$z=z^n+c,i=i+1$};
+\node[decision, below of = pro0, yshift = -1cm](dec1){$|z|>2?,i>MaxTimes?$};
+\node[io, below of = dec1, yshift = -1cm](pro2){$z\notin Z_{n,c}$};
+\node[io, below of = point1, yshift = -1cm](pro1){$z\in Z_{n,c}$};
+\node[process, below of = pro2, yshift = -1cm](out2){Setcolor(i)};
+\node[startstop, below of = out2, yshift = -1cm](stop){Stop};
+\draw [arrow] (start) -- (in);
+\draw [arrow] (in) -- (pro0);
+\draw [arrow] (pro0) -- (dec1);
+\draw (dec1) -- node [above] {No,Yes} (point1);
+\draw [arrow] (point1) -- (pro1);
+\draw (dec1) -- node [below] {No,No} (point2);
+\draw (dec1) -- (point2) -- (point3);
+\draw [arrow] (point3) -- (pro0);
+\draw [arrow] (dec1) -- node [right] {Yes,--} (pro2);
+\draw [arrow] (pro1) -- (out2);
+\draw [arrow] (pro2) -- (out2);
+\draw [arrow] (out2) -- (stop);
+\end{tikzpicture}
+
+\subsection{算例及分析}
+给定\{n,x,y\}，其中$c=x+iy$，程序将逐一对每个像素点进行上述操作，得到图像。下面展示的六个例子分别取\{2,0.1,0.62\},\{3,0.5,0.6\},\{4,0.5,0.61\},\\\{5,0.2,0.695\},\{6,0.51,0.61\},\{12,0.61245,0.61245\}，其中第一张是通常意义下的朱利亚集合，而其他五张图则是n>2的情况。由图可知，将图形旋转$\frac{2\pi}{n}$后得到的图形与原图重合。在实践过程中，我们可以发现在曼德博集合的边界附近选择c的值，得到的图形细节最多（如下面的图片）。
+
+
+\begin{figure}
+\includegraphics[width=3.6cm,height=2.4cm]{2}
+\includegraphics[width=3.6cm,height=2.4cm]{3}
+\includegraphics[width=3.6cm,height=2.4cm]{4}
+\includegraphics[width=3.6cm,height=2.4cm]{5}
+\includegraphics[width=3.6cm,height=2.4cm]{6}
+\includegraphics[width=3.6cm,height=2.4cm]{12}
+\end{figure}
+
+\section{总结}
+
+朱利亚集合是一种复杂分形，可以通过复二项式迭代来定义。根据这种定义，我们能用计算机作出其图形。定义式中的c与曼德博集合的关系决定了朱利亚集合的连通性。
+
+\bibliographystyle{plain}
+\bibliography{ref}
+
+\end{document}
